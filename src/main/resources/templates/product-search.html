@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search products · Famme Product Catalog</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/webawesome.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/themes/default.css">
+    <link rel="stylesheet" th:href="@{/app.css}">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta5/dist/htmx.js"></script>
+    <script defer th:src="@{/app.js}"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist-cdn/webawesome.loader.js"></script>
+</head>
+<body>
+<div class="catalog-app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('search')}"></aside>
+
+    <main class="catalog-shell catalog-search-shell">
+        <section class="catalog-intro wa-stack wa-gap-s">
+            <h1>Search products</h1>
+            <p>Products load automatically. Results update by title as you type, and every search word is matched.</p>
+        </section>
+
+        <wa-card>
+            <form class="wa-stack wa-gap-m"
+                  autocomplete="off"
+                  hx-get="/product/search/results"
+                  hx-trigger="change delay:300ms"
+                  hx-target="#product-table-container"
+                  hx-swap="outerHTML"
+                  hx-indicator="#search-indicator"
+                  hx-sync="this:replace">
+                <div class="catalog-search-controls">
+                    <wa-input id="search-query"
+                              name="query"
+                              label="Search by title"
+                              placeholder="Start typing a product title"
+                              th:value="${query}"
+                              autocapitalize="none"
+                              autocorrect="off"
+                              spellcheck="false"
+                              oninput="this.closest('form').dispatchEvent(new Event('change', { bubbles: true }))">
+                    </wa-input>
+                    <wa-select id="product-type"
+                               name="productType"
+                               label="Product type"
+                               th:value="${selectedProductType}"
+                               onchange="event.stopPropagation(); this.closest('form').dispatchEvent(new Event('change', { bubbles: true }))">
+                        <wa-option value="" th:selected="${selectedProductType == ''}">All product types</wa-option>
+                        <wa-option th:each="type : ${productTypes}"
+                                   th:value="${type}"
+                                   th:selected="${type == selectedProductType}"
+                                   th:text="${type}"></wa-option>
+                    </wa-select>
+                </div>
+                <wa-progress-bar id="search-indicator" class="htmx-indicator" indeterminate></wa-progress-bar>
+            </form>
+        </wa-card>
+
+        <div th:replace="~{fragments/product-table :: productTable}"></div>
+    </main>
+</div>
+</body>
+</html>

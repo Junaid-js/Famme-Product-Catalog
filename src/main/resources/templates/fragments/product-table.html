@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<div th:fragment="productTable" id="product-table-container" aria-live="polite">
+    <wa-card>
+        <div class="catalog-table-heading">
+            <div>
+                <h2>Products</h2>
+                <p><span th:text="${resultCount}"></span> products found</p>
+            </div>
+        </div>
+
+        <div class="catalog-empty" th:unless="${hasProducts}">
+            <h3>No products found</h3>
+            <p>Try a different search or <a th:href="@{/product/new}">add a product</a>.</p>
+        </div>
+
+        <wa-scroller th:if="${hasProducts}">
+            <table class="wa-hover-rows">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Vendor</th>
+                    <th>Type</th>
+                    <th>Variants</th>
+                    <th class="catalog-actions-heading">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="product, productStatus : ${products}">
+                <tr class="catalog-product-row"
+                    th:classappend="${productStatus.even} ? ' catalog-product-row-even' : ''">
+                    <td>
+                        <a th:href="@{/product/{id}(id=${product.id})}" th:text="${product.title}"></a>
+                    </td>
+                    <td th:text="${product.vendor}"></td>
+                    <td>
+                        <wa-badge variant="neutral" th:text="${product.productType}"></wa-badge>
+                    </td>
+                    <td>
+                        <wa-button class="catalog-variant-trigger"
+                                   th:id="|product-variants-toggle-${product.id}|"
+                                   size="s"
+                                   appearance="outlined"
+                                   th:hx-get="@{/product/{id}/variants(id=${product.id})}"
+                                   th:attr="hx-target=|global #product-variants-row-${product.id}|,aria-controls=|product-variants-row-${product.id}|"
+                                   hx-swap="outerHTML"
+                                   title="Show variants"
+                                   aria-expanded="false">
+                            <span th:text="${product.variantCount}"></span>
+                            <span th:text="${product.variantCount == 1 ? 'variant' : 'variants'}"></span>
+                            <wa-icon class="catalog-variant-chevron"
+                                     slot="end"
+                                     name="chevron-right"
+                                     aria-hidden="true"></wa-icon>
+                        </wa-button>
+                    </td>
+                    <td>
+                        <div class="wa-cluster wa-gap-xs catalog-row-actions">
+                            <wa-button size="s"
+                                       variant="danger"
+                                       appearance="outlined"
+                                       th:onclick="|document.getElementById('delete-product-${product.id}').showModal()|">
+                                Delete
+                            </wa-button>
+                        </div>
+                        <dialog class="catalog-delete-dialog" th:id="|delete-product-${product.id}|">
+                            <div class="wa-stack wa-gap-m">
+                                <div>
+                                    <h3>Delete product?</h3>
+                                    <p>“<span th:text="${product.title}"></span>” will be permanently removed.</p>
+                                </div>
+                                <div class="wa-cluster wa-gap-s catalog-dialog-actions">
+                                    <wa-button appearance="outlined" onclick="this.closest('dialog').close()">Cancel</wa-button>
+                                    <wa-button variant="danger"
+                                               th:hx-delete="@{/product/{id}(id=${product.id},query=${query},productType=${selectedProductType},tableContext=${tableContext})}"
+                                               hx-target="#product-table-container"
+                                               hx-swap="outerHTML">
+                                        Delete product
+                                    </wa-button>
+                                </div>
+                            </div>
+                        </dialog>
+                    </td>
+                </tr>
+                <tr class="catalog-variant-row"
+                    th:id="|product-variants-row-${product.id}|"
+                    hidden>
+                    <td colspan="5"></td>
+                </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </wa-scroller>
+    </wa-card>
+</div>
+</body>
+</html>

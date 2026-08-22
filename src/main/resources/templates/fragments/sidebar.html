@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<aside th:fragment="sidebar(activePage)" class="catalog-sidebar">
+    <a class="catalog-brand" th:href="@{/product}">Famme Catalog</a>
+    <nav class="catalog-sidebar-nav" aria-label="Product navigation">
+        <a class="catalog-nav-link"
+           th:attr="aria-current=${activePage == 'overview' ? 'page' : null}"
+           th:href="@{/product}">Overview</a>
+        <a class="catalog-nav-link"
+           th:attr="aria-current=${activePage == 'add' ? 'page' : null}"
+           th:href="@{/product/new}">Add product</a>
+        <a class="catalog-nav-link"
+           th:attr="aria-current=${activePage == 'search' ? 'page' : null}"
+           th:href="@{/product/search}">Search product</a>
+    </nav>
+</aside>
+</body>
+</html>

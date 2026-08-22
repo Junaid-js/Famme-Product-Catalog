@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<tr th:fragment="productVariants"
+    th:id="|product-variants-row-${product.id}|"
+    class="catalog-variant-row">
+<td colspan="5">
+<section class="catalog-variant-panel wa-stack wa-gap-m" aria-live="polite">
+    <div class="wa-flank:end wa-gap-m catalog-variant-heading">
+        <div class="wa-stack wa-gap-2xs">
+            <h3>Variants for <span th:text="${product.title}"></span></h3>
+            <p><span th:text="${variants.size()}"></span> variants found</p>
+        </div>
+        <wa-button size="s"
+                   appearance="plain"
+                   th:onclick="|collapseProductVariants(document.getElementById('product-variants-toggle-${product.id}'))|">
+            Close
+        </wa-button>
+    </div>
+
+    <div class="catalog-empty" th:unless="${hasVariants}">
+        <p th:if="${product.externalId == null}">Manually added products do not have imported variants.</p>
+        <p th:unless="${product.externalId == null}">No variants were returned for this product.</p>
+    </div>
+
+    <wa-scroller th:if="${hasVariants}">
+        <table class="wa-zebra-rows catalog-variant-table">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>SKU</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="variant : ${variants}">
+                <td th:text="${variant.title}"></td>
+                <td th:text="${#strings.isEmpty(variant.sku) ? '—' : variant.sku}"></td>
+                <td th:text="${variant.price}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </wa-scroller>
+</section>
+</td>
+</tr>
+</body>
+</html>

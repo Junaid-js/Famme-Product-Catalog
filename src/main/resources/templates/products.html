@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Famme Product Catalog</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/webawesome.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/themes/default.css">
+    <link rel="stylesheet" th:href="@{/app.css}">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta5/dist/htmx.js"></script>
+    <script defer th:src="@{/app.js}"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist-cdn/webawesome.loader.js"></script>
+</head>
+<body>
+<div class="catalog-app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('overview')}"></aside>
+
+    <main class="catalog-shell">
+        <section class="catalog-intro wa-stack wa-gap-s">
+            <h1 class="catalog-home-title">Products, kept simple</h1>
+            <p>Load the product catalog from PostgreSQL, then manage products without a full page reload.</p>
+        </section>
+
+        <wa-card class="catalog-load-card">
+            <div class="wa-flank:end wa-gap-m">
+                <div>
+                    <h2>Product catalog</h2>
+                    <p>The scheduled importer populates PostgreSQL from Famme when the application starts.</p>
+                </div>
+                <wa-button variant="brand"
+                           hx-get="/product/table"
+                           hx-target="#product-table-container"
+                           hx-swap="outerHTML"
+                           hx-indicator="#load-indicator">
+                    Load products
+                </wa-button>
+            </div>
+            <wa-progress-bar id="load-indicator" class="htmx-indicator" indeterminate></wa-progress-bar>
+        </wa-card>
+
+        <div id="product-table-container" aria-live="polite"></div>
+    </main>
+</div>
+</body>
+</html>

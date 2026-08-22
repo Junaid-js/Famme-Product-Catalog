@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="|Edit ${product.title} · Famme Product Catalog|">Edit product</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/webawesome.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/themes/default.css">
+    <link rel="stylesheet" th:href="@{/app.css}">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta5/dist/htmx.js"></script>
+    <script defer th:src="@{/app.js}"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist-cdn/webawesome.loader.js"></script>
+</head>
+<body>
+<div class="catalog-app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('overview')}"></aside>
+
+    <main class="catalog-shell catalog-form-shell">
+        <section th:fragment="editForm" id="product-edit-form" class="wa-stack wa-gap-l" aria-live="polite">
+            <div class="catalog-intro wa-stack wa-gap-s">
+                <div class="wa-cluster wa-gap-xs">
+                    <wa-badge variant="brand" th:text="${sourceLabel}"></wa-badge>
+                    <wa-badge variant="neutral"><span th:text="${product.variantCount}"></span> variants</wa-badge>
+                </div>
+                <h1 th:text="${product.title}"></h1>
+                <p>Update the product details stored in PostgreSQL. Existing variants stay unchanged; new variants are appended.</p>
+            </div>
+
+            <wa-card>
+                <div class="wa-stack wa-gap-m">
+                    <p class="catalog-success" role="status" th:if="${successMessage}" th:text="${successMessage}"></p>
+                    <form class="catalog-edit-form"
+                          th:object="${productForm}"
+                          th:hx-put="@{/product/{id}(id=${product.id})}"
+                          hx-target="#product-edit-form"
+                          hx-swap="outerHTML">
+                        <label>
+                            <span>Title</span>
+                            <wa-input name="title" th:value="*{title}" required></wa-input>
+                            <small class="catalog-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                        </label>
+                        <label>
+                            <span>Vendor</span>
+                            <wa-input name="vendor" th:value="*{vendor}" required></wa-input>
+                            <small class="catalog-error" th:if="${#fields.hasErrors('vendor')}" th:errors="*{vendor}"></small>
+                        </label>
+                        <label>
+                            <span>Product type</span>
+                            <wa-input name="productType" th:value="*{productType}" required></wa-input>
+                            <small class="catalog-error" th:if="${#fields.hasErrors('productType')}" th:errors="*{productType}"></small>
+                        </label>
+                        <div th:replace="~{fragments/product-variant-form :: variantFields(${productForm.variants})}"></div>
+                        <div class="wa-cluster wa-gap-s catalog-form-actions">
+                            <wa-button type="submit" variant="brand">Save changes</wa-button>
+                            <wa-button th:href="@{/product}" appearance="outlined">Back to overview</wa-button>
+                        </div>
+                    </form>
+                </div>
+            </wa-card>
+        </section>
+    </main>
+</div>
+</body>
+</html>

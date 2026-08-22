@@ -1,0 +1,35 @@
+@host = http://localhost:8080
+@productId = 1
+
+### Open the product page
+GET {{host}}/product
+
+### Load the product region from PostgreSQL
+GET {{host}}/product/table
+HX-Request: true
+
+### Search by title and product type
+GET {{host}}/product/search/results?query=soft&productType=Sports%20Bra
+HX-Request: true
+
+### Load a product's variants from JSONB
+GET {{host}}/product/{{productId}}/variants
+HX-Request: true
+
+### Add a manual product
+POST {{host}}/product
+Content-Type: application/x-www-form-urlencoded
+HX-Request: true
+
+title=Studio+Bottle&vendor=Local+Studio&productType=Water+Bottle&variants[0].title=750ml&variants[0].sku=SB-750&variants[0].price=249.00
+
+### Update a product
+PUT {{host}}/product/{{productId}}
+Content-Type: application/x-www-form-urlencoded
+HX-Request: true
+
+title=Updated+Product&vendor=Updated+Vendor&productType=Updated+Type&variants[0].title=Black%20%2F%20L&variants[0].sku=UP-BLACK-L&variants[0].price=299.00
+
+### Delete a product
+DELETE {{host}}/product/{{productId}}
+HX-Request: true

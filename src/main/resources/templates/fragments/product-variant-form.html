@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<section th:fragment="variantFields(variants)" class="catalog-variant-builder wa-stack wa-gap-m">
+    <div class="wa-flank:end wa-gap-m">
+        <div class="wa-stack wa-gap-2xs">
+            <h2>Variants</h2>
+            <p>Optional. Add a title, SKU, and price for each new variant.</p>
+        </div>
+        <wa-button type="button"
+                   appearance="outlined"
+                   onclick="addProductVariantField()">
+            <wa-icon slot="start" name="plus" aria-hidden="true"></wa-icon>
+            Add variant
+        </wa-button>
+    </div>
+
+    <div id="product-variant-fields" class="wa-stack wa-gap-m">
+        <div class="catalog-new-variant wa-stack wa-gap-s"
+             th:each="variant, variantStatus : ${variants}">
+            <div class="wa-flank:end wa-gap-s">
+                <strong data-variant-number th:text="|Variant ${variantStatus.count}|"></strong>
+                <wa-button type="button"
+                           size="s"
+                           appearance="outlined"
+                           variant="danger"
+                           onclick="removeProductVariantField(this)">
+                    Remove
+                </wa-button>
+            </div>
+            <div class="catalog-new-variant-fields">
+                <div>
+                    <wa-input label="Title"
+                              data-variant-field="title"
+                              th:name="|variants[${variantStatus.index}].title|"
+                              th:value="${variant.title}"
+                              required></wa-input>
+                    <small class="catalog-error"
+                           th:if="${#fields.hasErrors('variants[' + variantStatus.index + '].title')}"
+                           th:errors="*{variants[__${variantStatus.index}__].title}"></small>
+                </div>
+                <div>
+                    <wa-input label="SKU"
+                              data-variant-field="sku"
+                              th:name="|variants[${variantStatus.index}].sku|"
+                              th:value="${variant.sku}"></wa-input>
+                    <small class="catalog-error"
+                           th:if="${#fields.hasErrors('variants[' + variantStatus.index + '].sku')}"
+                           th:errors="*{variants[__${variantStatus.index}__].sku}"></small>
+                </div>
+                <div>
+                    <wa-input label="Price"
+                              data-variant-field="price"
+                              th:name="|variants[${variantStatus.index}].price|"
+                              th:value="${variant.price}"
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              required></wa-input>
+                    <small class="catalog-error"
+                           th:if="${#fields.hasErrors('variants[' + variantStatus.index + '].price')}"
+                           th:errors="*{variants[__${variantStatus.index}__].price}"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <template id="product-variant-template">
+        <div class="catalog-new-variant wa-stack wa-gap-s">
+            <div class="wa-flank:end wa-gap-s">
+                <strong data-variant-number>Variant</strong>
+                <wa-button type="button"
+                           size="s"
+                           appearance="outlined"
+                           variant="danger"
+                           onclick="removeProductVariantField(this)">
+                    Remove
+                </wa-button>
+            </div>
+            <div class="catalog-new-variant-fields">
+                <wa-input label="Title"
+                          data-variant-field="title"
+                          name="variants[__INDEX__].title"
+                          required></wa-input>
+                <wa-input label="SKU"
+                          data-variant-field="sku"
+                          name="variants[__INDEX__].sku"></wa-input>
+                <wa-input label="Price"
+                          data-variant-field="price"
+                          name="variants[__INDEX__].price"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          required></wa-input>
+            </div>
+        </div>
+    </template>
+</section>
+</body>
+</html>

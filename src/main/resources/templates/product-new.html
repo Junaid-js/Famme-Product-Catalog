@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add product · Famme Product Catalog</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/webawesome.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/themes/default.css">
+    <link rel="stylesheet" th:href="@{/app.css}">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta5/dist/htmx.js"></script>
+    <script defer th:src="@{/app.js}"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist-cdn/webawesome.loader.js"></script>
+</head>
+<body>
+<div class="catalog-app">
+    <aside th:replace="~{fragments/sidebar :: sidebar('add')}"></aside>
+
+    <main class="catalog-shell catalog-form-shell">
+        <section th:fragment="createForm" id="product-create-form" class="wa-stack wa-gap-l" aria-live="polite">
+            <div class="catalog-intro wa-stack wa-gap-s">
+                <h1>Add product</h1>
+                <p>Create a local product in PostgreSQL. The product list will include it immediately.</p>
+            </div>
+
+            <wa-card>
+                <div class="wa-stack wa-gap-m">
+                    <div class="catalog-success" role="status" th:if="${successMessage}">
+                        <strong th:text="${successMessage}"></strong>
+                        <p>
+                            <a th:href="@{/product/{id}(id=${createdProductId})}" th:text="${createdProductTitle}"></a>
+                            is ready to edit.
+                        </p>
+                    </div>
+                    <form class="catalog-create-form"
+                          th:object="${productForm}"
+                          hx-post="/product"
+                          hx-target="#product-create-form"
+                          hx-swap="outerHTML">
+                        <label>
+                            <span>Title</span>
+                            <wa-input name="title" th:value="*{title}" required></wa-input>
+                            <small class="catalog-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                        </label>
+                        <label>
+                            <span>Vendor</span>
+                            <wa-input name="vendor" th:value="*{vendor}" required></wa-input>
+                            <small class="catalog-error" th:if="${#fields.hasErrors('vendor')}" th:errors="*{vendor}"></small>
+                        </label>
+                        <label>
+                            <span>Product type</span>
+                            <wa-input name="productType" th:value="*{productType}" required></wa-input>
+                            <small class="catalog-error" th:if="${#fields.hasErrors('productType')}" th:errors="*{productType}"></small>
+                        </label>
+
+                        <div th:replace="~{fragments/product-variant-form :: variantFields(${productForm.variants})}"></div>
+
+                        <wa-button type="submit" variant="brand">Add product</wa-button>
+                    </form>
+                </div>
+            </wa-card>
+        </section>
+    </main>
+</div>
+</body>
+</html>

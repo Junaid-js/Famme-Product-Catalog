@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: famme-product-catalog
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:55432/famme_catalog}
+    username: ${DATABASE_USERNAME:famme}
+    password: ${DATABASE_PASSWORD:famme}
+  thymeleaf:
+    cache: false
+
+products:
+  source-url: https://famme.no/products.json
