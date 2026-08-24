@@ -8,6 +8,7 @@ import tools.jackson.databind.json.JsonMapper
 class ProductService(
 	private val productRepository: ProductRepository,
 	private val jsonMapper: JsonMapper,
+	private val productEventBroadcaster: ProductEventBroadcaster,
 ) {
 	@Transactional(readOnly = true)
 	fun findProducts(query: String?, productType: String?): List<Product> {
@@ -33,28 +34,33 @@ class ProductService(
 	}
 
 	@Transactional
-	fun createProduct(form: ProductForm): Int {
+	fun createProduct(form: ProductForm, actorClientId: String?): Int {
 		val normalizedForm = form.normalized()
-		return productRepository.create(
+		val id = productRepository.create(
 			normalizedForm,
 			jsonMapper.writeValueAsString(normalizedForm.variants),
 		)
+		productEventBroadcaster.publish(ProductEvent(ProductEventType.CREATED, id, normalizedForm.title, actorClientId))
+		return id
 	}
 
 	@Transactional
-	fun updateProduct(id: Int, form: ProductForm) {
+	fun updateProduct(id: Int, form: ProductForm, actorClientId: String?) {
 		val normalizedForm = form.normalized()
 		val variantsJson = jsonMapper.writeValueAsString(normalizedForm.variants)
 		if (productRepository.update(id, normalizedForm, variantsJson) == 0) {
 			throw NoSuchElementException("Product $id was not found")
 		}
+		productEventBroadcaster.publish(ProductEvent(ProductEventType.UPDATED, id, normalizedForm.title, actorClientId))
 	}
 
 	@Transactional
-	fun deleteProduct(id: Int) {
+	fun deleteProduct(id: Int, actorClientId: String?) {
+		val product = productRepository.findById(id) ?: throw NoSuchElementException("Product $id was not found")
 		if (productRepository.delete(id) == 0) {
 			throw NoSuchElementException("Product $id was not found")
 		}
+		productEventBroadcaster.publish(ProductEvent(ProductEventType.DELETED, id, product.title, actorClientId))
 	}
 
 	private fun ProductForm.normalized(): ProductForm {

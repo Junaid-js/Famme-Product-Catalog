@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/webawesome.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist/styles/themes/default.css">
     <link rel="stylesheet" th:href="@{/app.css}">
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0-beta5/dist/htmx.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.js"></script>
     <script defer th:src="@{/app.js}"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist-cdn/webawesome.loader.js"></script>
 </head>
@@ -35,7 +35,8 @@
                           th:object="${productForm}"
                           hx-post="/product"
                           hx-target="#product-create-form"
-                          hx-swap="outerHTML">
+                          hx-swap="outerHTML"
+                          hx-vals="js:{clientId: getCatalogClientId()}">
                         <label>
                             <span>Title</span>
                             <wa-input name="title" th:value="*{title}" required></wa-input>

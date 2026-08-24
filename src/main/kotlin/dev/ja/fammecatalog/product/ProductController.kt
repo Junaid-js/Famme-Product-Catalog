@@ -2,6 +2,7 @@ package dev.ja.fammecatalog.product
 
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.validation.BindingResult
@@ -16,14 +17,20 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @Controller
 @RequestMapping("/product")
 class ProductController(
 	private val productService: ProductService,
+	private val productEventBroadcaster: ProductEventBroadcaster,
 ) {
 	@GetMapping
 	fun products(): String = "products"
+
+	@GetMapping("/events", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+	@ResponseBody
+	fun productEvents(): SseEmitter = productEventBroadcaster.subscribe()
 
 	@GetMapping("/table")
 	fun productTable(model: Model): String {
@@ -41,10 +48,11 @@ class ProductController(
 	fun createProduct(
 		@Valid @ModelAttribute("productForm") productForm: ProductForm,
 		bindingResult: BindingResult,
+		@RequestParam(required = false) clientId: String?,
 		model: Model,
 	): String {
 		if (!bindingResult.hasErrors()) {
-			val productId = productService.createProduct(productForm)
+			val productId = productService.createProduct(productForm, clientId)
 			model.addAttribute("productForm", ProductForm())
 			model.addAttribute("successMessage", "Product added")
 			model.addAttribute("createdProductId", productId)
@@ -95,6 +103,7 @@ class ProductController(
 		@PathVariable id: Int,
 		@Valid @ModelAttribute("productForm") productForm: ProductForm,
 		bindingResult: BindingResult,
+		@RequestParam(required = false) clientId: String?,
 		model: Model,
 	): String {
 		if (bindingResult.hasErrors()) {
@@ -102,7 +111,7 @@ class ProductController(
 			return PRODUCT_EDIT_FRAGMENT
 		}
 
-		productService.updateProduct(id, productForm)
+		productService.updateProduct(id, productForm, clientId)
 		val product = productService.findProduct(id)
 		addEditModel(model, product, ProductForm(product.title, product.vendor, product.productType))
 		model.addAttribute("successMessage", "Product updated")
@@ -115,9 +124,10 @@ class ProductController(
 		@RequestParam(required = false) query: String?,
 		@RequestParam(required = false) productType: String?,
 		@RequestParam(defaultValue = OVERVIEW_CONTEXT) tableContext: String,
+		@RequestParam(required = false) clientId: String?,
 		model: Model,
 	): String {
-		productService.deleteProduct(id)
+		productService.deleteProduct(id, clientId)
 		addProductList(model, query, productType, normalizedTableContext(tableContext))
 		return PRODUCT_TABLE_FRAGMENT
 	}

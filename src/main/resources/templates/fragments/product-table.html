@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <body>
-<div th:fragment="productTable" id="product-table-container" aria-live="polite">
+<div th:fragment="productTable" id="product-table-container" aria-live="polite"
+     hx-trigger="sse:product-created, sse:product-updated, sse:product-deleted"
+     th:hx-get="${tableContext == 'search'} ? @{/product/search/results(query=${query},productType=${selectedProductType})} : @{/product/table}"
+     hx-swap="outerHTML">
     <wa-card>
         <div class="catalog-table-heading">
             <div>
@@ -75,7 +78,8 @@
                                     <wa-button variant="danger"
                                                th:hx-delete="@{/product/{id}(id=${product.id},query=${query},productType=${selectedProductType},tableContext=${tableContext})}"
                                                hx-target="#product-table-container"
-                                               hx-swap="outerHTML">
+                                               hx-swap="outerHTML"
+                                               hx-vals="js:{clientId: getCatalogClientId()}">
                                         Delete product
                                     </wa-button>
                                 </div>

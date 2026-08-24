@@ -289,6 +289,20 @@ th {
     max-width: 48rem;
 }
 
+.catalog-conflict-banner wa-callout {
+    align-items: center;
+}
+
+.catalog-conflict-banner wa-callout::part(base) {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-m);
+}
+
+.catalog-conflict-banner [data-conflict-message] {
+    flex: 1;
+}
+
 .catalog-search-shell {
     max-width: 64rem;
 }

@@ -1,5 +1,45 @@
 'use strict';
 
+function getCatalogClientId() {
+    try {
+        let clientId = sessionStorage.getItem('catalogClientId');
+        if (!clientId) {
+            clientId = `editor-${Math.random().toString(36).slice(2, 8)}`;
+            sessionStorage.setItem('catalogClientId', clientId);
+        }
+        return clientId;
+    } catch {
+        return 'editor-unknown';
+    }
+}
+window.getCatalogClientId = getCatalogClientId;
+
+document.addEventListener('htmx:sseMessage', (event) => {
+    const banner = document.getElementById('product-conflict-banner');
+    if (!banner || !banner.dataset.productId) {
+        return;
+    }
+
+    let change;
+    try {
+        change = JSON.parse(event.detail.data);
+    } catch {
+        return;
+    }
+
+    if (String(change.productId) !== banner.dataset.productId) {
+        return;
+    }
+    if (change.actorClientId && change.actorClientId === getCatalogClientId()) {
+        return;
+    }
+
+    banner.querySelector('[data-conflict-message]').textContent = change.type === 'product-deleted'
+        ? `"${change.title}" was deleted by another editor.`
+        : `"${change.title}" was just updated by another editor. Reload to see the latest version.`;
+    banner.hidden = false;
+});
+
 function collapseProductVariants(button) {
     const row = document.getElementById(button.getAttribute('aria-controls'));
     if (row) {
